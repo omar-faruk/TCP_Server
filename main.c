@@ -14,19 +14,30 @@
 pthread_t listener_thread;
 
 
-void encodeData(char *msg, char *enc_data, int raw_data_len, int *enc_len)
-{
+
+void encodeData(uint8_t *msg, uint8_t *enc_data, int raw_data_len, int *enc_len){
 
     int i,j;
-    uint8_t ms_bits;
+    uint8_t ms_bits,value;
+    _Bool a;
+
+    if(raw_data_len%7 != 0){
+        while(raw_data_len%7!=0){
+            msg[raw_data_len] = 0x00;
+            raw_data_len++;
+        }
+    }
 
     for(i=0,j=0;i<raw_data_len;i++){
 
-        ms_bits|=(uint8_t)((msg[i]&(1<<7))<<(6-(i%7)));
+        ms_bits = ms_bits | (((_Bool)(msg[i]&(1<<7)))<<(6-(i%7)));
+        printf("%x ",ms_bits);
         enc_data[j++]=(msg[i]&~(1<<7));
 
         if(((i+1)%7)==0 && i>0){
-            enc_data[j++]=(char)(ms_bits);
+            enc_data[j++]=(ms_bits);
+            printf("encoded ms_bits: %x\n",ms_bits);
+            ms_bits = 0x00;
         }
     }
     enc_data[j]='\0';
@@ -34,8 +45,7 @@ void encodeData(char *msg, char *enc_data, int raw_data_len, int *enc_len)
 
 }
 
-void decodeData(char *encoded_data, char *decoded_data, int len,int *decoded_data_length)
-{
+void decodeData(uint8_t *encoded_data, uint8_t *decoded_data, int len,int *decoded_data_length){
 
     int i,j;
     uint8_t ms_bits=0;
@@ -48,7 +58,7 @@ void decodeData(char *encoded_data, char *decoded_data, int len,int *decoded_dat
         if(i==0){
             ms_bits=(uint8_t)(encoded_data[7]);
         }
-        decoded_data[j++]=encoded_data[i]|((uint8_t)(ms_bits&(1<<(6-(i%8))))<<7);
+        decoded_data[j++]=encoded_data[i]|((_Bool)(ms_bits&(1<<(6-(i%8))))<<7);
     }
     *decoded_data_length=j;
     decoded_data[j]='\0';
@@ -56,9 +66,9 @@ void decodeData(char *encoded_data, char *decoded_data, int len,int *decoded_dat
 
 void *read_socket(void *sock_ptr)
 {
-    char buffer[1024];
-    char data[1024];
-    int data_length = 0;
+    uint8_t buffer[1024];
+    uint8_t data[1024];
+    int i,data_length = 0;
     int socket_fd = *((int *)sock_ptr);
     free(sock_ptr);
 
@@ -66,15 +76,25 @@ void *read_socket(void *sock_ptr)
 
     while(1)
     {
+        if(socket_fd)
         read(socket_fd,buffer,1024);
-        decodeData(buffer,data,strlen(buffer),&data_length);
 
-        puts(data);
-        printf("Input for socket:%d\t:",socket_fd);
-        scanf("%s",buffer);
-        send(socket_fd,buffer,strlen(buffer),0);
+        if(strlen(buffer)>0)
+        {
+            for(i=0;i<strlen(buffer);i++)
+            {
+                printf("%x ",buffer[i]);
+            }
+            puts("");
+            decodeData(buffer,data,strlen(buffer),&data_length);
+        }
+
+        //printf("Input for socket:%d\t:",socket_fd);
+        //scanf("%s",buffer);
+        //send(socket_fd,buffer,strlen(buffer),0);
 
         memset(buffer,0,strlen(buffer));
+        memset(data,0,strlen(data));
     }
 
 }
