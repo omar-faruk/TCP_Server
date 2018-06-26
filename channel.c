@@ -6,5 +6,9 @@
 
 void control(uint8_t *msg, int msg_len)
 {
+    int i,payload_length;
+    uint8_t *p;
 
+    payload_length = msg[3];
+    
 }

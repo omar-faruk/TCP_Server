@@ -59,6 +59,7 @@ void parser(uint8_t *msg, int msg_len){
         {
             case CONTROL:
                 puts("open controll channel");
+                control(msg,msg_len);
                 break;
 
             case GPS:

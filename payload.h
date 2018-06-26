@@ -1,0 +1,8 @@
+//
+// Created by munna on 6/26/18.
+//
+
+#ifndef VTSTESTSERVER_PAYLOAD_H
+#define VTSTESTSERVER_PAYLOAD_H
+
+#endif //VTSTESTSERVER_PAYLOAD_H
