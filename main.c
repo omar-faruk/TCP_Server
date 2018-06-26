@@ -1,6 +1,7 @@
 // Server side C/C++ program to demonstrate Socket programming
 #include <unistd.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <sys/socket.h>
 #include <stdlib.h>
 #include <netinet/in.h>
@@ -13,13 +14,78 @@
 
 pthread_t listener_thread;
 
+typedef enum{
+    CONTROL= 0,
+    GPS,
+    ENGINE,
+    AC,
+    DOOR,
+    PANIC,
+    GEOFENCE,
+    AUDIOSPY,
+    IMAGE,
+    FUEL,
+    LOUDHORN,
+    BATTERY
+}ChannelID;
 
+int msglen(uint8_t *msg)
+{
+    int length=1;
+
+    while(msg[length++]!=0x79){}
+
+    return length;
+}
+
+void parser(uint8_t *msg, int msg_len){
+
+    int i;
+
+    if(msg[0]!= 0xF9){
+        perror("invalid packet");
+    }
+    else{
+        for(i=0;i<msg_len;i++)
+        {
+            printf("%x ",msg[i]);
+        }
+        puts("");
+        switch (msg[1])
+        {
+            case CONTROL:
+                puts("open controll channel");
+                break;
+            case GPS:
+                puts("open GPS channel");
+                break;
+            case ENGINE:
+                puts("open ENGINE channel");
+                break;
+            case AC:
+                puts("open AC chanel");
+                break;
+            case DOOR:
+                puts("open DOOR channel");
+                break;
+            case PANIC:
+                puts("open PANIC channel");
+            default:
+                puts("unknown channel id");
+                break;
+
+        }
+
+
+    }
+
+}
 
 void encodeData(uint8_t *msg, uint8_t *enc_data, int raw_data_len, int *enc_len){
 
     int i,j;
     uint8_t ms_bits,value;
-    _Bool a;
+    bool a;
 
     if(raw_data_len%7 != 0){
         while(raw_data_len%7!=0){
@@ -58,14 +124,13 @@ void decodeData(uint8_t *encoded_data, uint8_t *decoded_data, int len,int *decod
         if(i==0){
             ms_bits=(uint8_t)(encoded_data[7]);
         }
-        decoded_data[j++]=encoded_data[i]|((_Bool)(ms_bits&(1<<(6-(i%8))))<<7);
+        decoded_data[j++]=encoded_data[i]|((bool)(ms_bits&(1<<(6-(i%8))))<<7);
     }
     *decoded_data_length=j;
     decoded_data[j]='\0';
 }
 
-void *read_socket(void *sock_ptr)
-{
+void *read_socket(void *sock_ptr) {
     uint8_t buffer[1024];
     uint8_t data[1024];
     int i,data_length = 0;
@@ -76,31 +141,31 @@ void *read_socket(void *sock_ptr)
 
     while(1)
     {
-        if(socket_fd)
         read(socket_fd,buffer,1024);
 
         if(strlen(buffer)>0)
         {
-            for(i=0;i<strlen(buffer);i++)
+            printf("bytes received: %d\n",msglen(buffer));
+            for(i=0;i<msglen(buffer);i++)
             {
                 printf("%x ",buffer[i]);
             }
             puts("");
-            decodeData(buffer,data,strlen(buffer),&data_length);
+            decodeData(buffer,data,msglen(buffer),&data_length);
+            parser(data,data_length);
         }
 
         //printf("Input for socket:%d\t:",socket_fd);
         //scanf("%s",buffer);
         //send(socket_fd,buffer,strlen(buffer),0);
 
-        memset(buffer,0,strlen(buffer));
-        memset(data,0,strlen(data));
+        memset(buffer,0,1024);
+        memset(data,0,1024);
     }
 
 }
 
-void *listener()
-{
+void *listener() {
 
 	int server_fd, new_socket, valread;
 	struct sockaddr_in address;
@@ -134,17 +199,19 @@ void *listener()
             perror("bind failed");
             exit(EXIT_FAILURE);
         }
+        puts("bind successfull");
         if (listen(server_fd, 3) < 0)
         {
             perror("listen");
             exit(EXIT_FAILURE);
         }
+        puts("listen successfull");
         if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0)
         {
             perror("accept");
             exit(EXIT_FAILURE);
         }
-
+        puts("accept successfull");
         int peer_add_len = sizeof(peer_address);
 
         int ret = getpeername(new_socket, (struct sockaddr *)&peer_address, (socklen_t*)&peer_add_len);
@@ -170,14 +237,13 @@ void *listener()
         int *socket_arg = malloc(sizeof(*socket_arg));
         *socket_arg = new_socket;
         pthread_create(&new_socket_reader,NULL,read_socket,socket_arg);
+        puts("");
     }
-
 
 
 }
 
-int main(int argc, char const *argv[])
-{
+int main(int argc, char const *argv[]) {
 
     int status;
 
@@ -190,7 +256,7 @@ int main(int argc, char const *argv[])
 
     while(1)
     {
-
+        sleep(1000);
     }
 
 }
