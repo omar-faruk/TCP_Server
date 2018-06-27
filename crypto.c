@@ -53,3 +53,12 @@ void decodeData(uint8_t *encoded_data, uint8_t *decoded_data, int len,int *decod
     *decoded_data_length=j;
     decoded_data[j]='\0';
 }
+
+void printData(uint8_t *msg, int msg_len){
+    int i;
+    for(i=0;i<msg_len;i++)
+    {
+        printf("%x ",msg[i]);
+    }
+    puts("");
+}

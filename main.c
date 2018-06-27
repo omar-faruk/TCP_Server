@@ -40,7 +40,7 @@ int msglen(uint8_t *msg)
     return length;
 }
 
-void parser(uint8_t *msg, int msg_len){
+void parser(uint8_t *msg, int msg_len,int socket_fd){
 
     int i;
 
@@ -49,17 +49,11 @@ void parser(uint8_t *msg, int msg_len){
     }
     else{
 
-        for(i=0;i<msg_len;i++)
-        {
-            printf("%x ",msg[i]);
-        }
-        puts("");
-
         switch (msg[1])
         {
             case CONTROL:
                 puts("open controll channel");
-                control(msg,msg_len);
+                control(msg,msg_len,socket_fd);
                 break;
 
             case GPS:
@@ -109,7 +103,6 @@ void parser(uint8_t *msg, int msg_len){
             default:
                 puts("unknown channel id");
                 break;
-
         }
     }
 }
@@ -130,13 +123,9 @@ void *read_socket(void *sock_ptr) {
         if(strlen(buffer)>0)
         {
             printf("bytes received: %d\n",msglen(buffer));
-            for(i=0;i<msglen(buffer);i++)
-            {
-                printf("%x ",buffer[i]);
-            }
-            puts("");
+            printData(buffer,msglen(buffer));
             decodeData(buffer,data,msglen(buffer),&data_length);
-            parser(data,data_length);
+            parser(data,data_length,socket_fd);
         }
 
         //printf("Input for socket:%d\t:",socket_fd);
