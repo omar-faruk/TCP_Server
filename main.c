@@ -45,6 +45,7 @@ void parser(uint8_t *msg, int msg_len,int socket_fd){
     int i;
 
     if(msg[0]!= 0xF9){
+        //actually crc check will be performed here
         perror("invalid packet");
     }
     else{
@@ -212,8 +213,6 @@ void *listener() {
         pthread_create(&new_socket_reader,NULL,read_socket,socket_arg);
         puts("");
     }
-
-
 }
 
 int main(int argc, char const *argv[]) {
@@ -221,6 +220,7 @@ int main(int argc, char const *argv[]) {
     int status;
 
     status = pthread_create(&listener_thread, NULL, listener, NULL);
+    cmd_lookup_table = malloc(10*sizeof(Ltable));
 
 
     if(status != 0 ){

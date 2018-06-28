@@ -7,6 +7,9 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 typedef struct reply{
     uint8_t *msg;
@@ -20,7 +23,7 @@ typedef struct lookup_table{
 }Ltable;
 
 Ltable *cmd_lookup_table;
-int table_size=0;
+int table_size;
 
 
 uint8_t* lookup(int socket_fd, int command_value);

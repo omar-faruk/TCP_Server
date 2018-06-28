@@ -81,10 +81,13 @@ int main(int argc, char const *argv[])
     int sock = 0,encoded_length;
     struct sockaddr_in serv_addr;
     uint8_t buffer[1024]={0},encoded_msg[1024]={0};
+
+
     uint8_t msg[] = {0xF9, 0x00, 0x81, 0x10, 0x01, 0x70, 0x69, 0x68, 0x65, 0x6c, 0x6c,
 					 0x6f, 0x77, 0x6f, 0x72, 0x6c, 0x64, 0x31, 0x32, 0x33, 0x8A, 0xF9
 					};
 
+	//uint8_t msg[] = {0xF9, 0x00, 0x88, 0x0B, 0x05, 'h', 'e', 'l', 'l', 'o', 'w', 'o', 'r', 'l', 'd', 0x89, 0xF9};
 
 	printf("message length: %d\n",msglen(msg));
 
@@ -125,8 +128,8 @@ int main(int argc, char const *argv[])
 
 		send(sock , encoded_msg , encoded_length , 0 );
 
-		//valread = read( sock , buffer, 1024);
-		//printf("received message: %s\n",buffer );
+		int valread = read( sock , buffer, 1024);
+		printf("received message: %s\n",buffer );
 		memset(buffer,0,1024);
 		memset(encoded_msg,0,1024);
 		//getchar();
@@ -136,6 +139,13 @@ int main(int argc, char const *argv[])
 }
 
 /*
+ //test sample
  0xF9, 0x00, 0x81, 0x10, 0x01, 0x70, 0x69, 0x68, 0x65, 0x6c, 0x6c,
  0x6f, 0x77, 0x6f, 0x72, 0x6c, 0x64, 0x31, 0x32, 0x33, 0x8A, 0xF9
+
+ //set reply of a command sample
+
+
+0xF9, 0x00, 0x88, 0x0B, 0x05, 'h', 'e', 'l', 'l', 'o', 'w', 'o', 'r', 'l', 'd', 0x89, 0xF9
+
  */

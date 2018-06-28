@@ -6,6 +6,9 @@
 #define VTSTESTSERVER_CHANNEL_H
 
 #include <stdint.h>
+#include <sys/socket.h>
+#include "crypto.h"
+#include "lookup.h"
 
 void control(uint8_t *msg, int msg_len,int socket_fd);
 void gps(uint8_t *msg, int msg_len,int socket_fd);
