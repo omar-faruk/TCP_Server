@@ -1,30 +1,40 @@
-#include <stdio.h>
 #include <sys/socket.h>
-#include <stdlib.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <unistd.h>
 #define PORT 6842
 
-#define BIT1 1
-#define BIT2 2
-#define BIT3 4
-#define BIT4 8
-#define BIT5 16
-#define BIT6 32
-#define BIT7 64
-#define BIT8 128
+int msglen(uint8_t *msg)
+{
+	int length=1;
 
+	while(msg[length++]!=0xF9){}
+
+	return length;
+}
+
+void printData(uint8_t *msg, int msg_len){
+    int i;
+    for(i=0;i<msg_len;i++)
+    {
+        printf("%x ",msg[i]);
+    }
+    puts("");
+}
 
 void encodeData(uint8_t *msg, uint8_t *enc_data, int raw_data_len, int *enc_len){
 
     int i,j;
-    uint8_t ms_bits,value;
-	_Bool a;
+    uint8_t ms_bits;
+	//_Bool a;
 
 	if(raw_data_len%7 != 0){
 		while(raw_data_len%7!=0){
-			msg[raw_data_len] = 0x00;
+			msg[raw_data_len] = 0xff;
 			raw_data_len++;
 		}
 	}
@@ -32,12 +42,12 @@ void encodeData(uint8_t *msg, uint8_t *enc_data, int raw_data_len, int *enc_len)
     for(i=0,j=0;i<raw_data_len;i++){
 
         ms_bits = ms_bits | (((_Bool)(msg[i]&(1<<7)))<<(6-(i%7)));
-        printf("%x ",ms_bits);
+        //printf("%x ",ms_bits);
         enc_data[j++]=(msg[i]&~(1<<7));
 
         if(((i+1)%7)==0 && i>0){
             enc_data[j++]=(ms_bits);
-            printf("encoded ms_bits: %x\n",ms_bits);
+            //printf("encoded ms_bits: %x\n",ms_bits);
             ms_bits = 0x00;
         }
     }
@@ -67,11 +77,16 @@ void decodeData(uint8_t *encoded_data, uint8_t *decoded_data, int len,int *decod
 
 int main(int argc, char const *argv[])
 {
-    struct sockaddr_in address;
-    int sock = 0, valread,encoded_length;
+    //struct sockaddr_in address;
+    int sock = 0,encoded_length;
     struct sockaddr_in serv_addr;
     uint8_t buffer[1024]={0},encoded_msg[1024]={0};
-    uint8_t msg[] = {0xF9, 0x81, 'a', 'b', 'c', 0xF9};
+    uint8_t msg[] = {0xF9, 0x00, 0x81, 0x10, 0x01, 0x70, 0x69, 0x68, 0x65, 0x6c, 0x6c,
+					 0x6f, 0x77, 0x6f, 0x72, 0x6c, 0x64, 0x31, 0x32, 0x33, 0x8A, 0xF9
+					};
+
+
+	printf("message length: %d\n",msglen(msg));
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
@@ -97,41 +112,30 @@ int main(int argc, char const *argv[])
         return -1;
     }
     while(1){
-		int i,j;
 
-		for(i=0;i<strlen(msg);i++){
-			printf("%x ",msg[i]);
-		}
-		puts("");
+		printData(msg,msglen(msg));
 
-		encodeData(msg,encoded_msg,strlen(msg),&encoded_length);
+		encodeData(msg,encoded_msg,msglen(msg),&encoded_length);
+
 		printf("encoded_data_length: %d\nencoded data: ",encoded_length);
+		printData(encoded_msg,encoded_length);
 
-		for(i=0;i<encoded_length;i++){
-			printf("%x ",encoded_msg[i]);
-		}
-		puts("");
-		decodeData(encoded_msg,buffer,encoded_length,&j);
-		for(i=0;i<j;i++){
-			printf("%x ",buffer[i]);
-		}
 
-		puts("");
+		//decodeData(encoded_msg,buffer,encoded_length,&j);
+
 		send(sock , encoded_msg , encoded_length , 0 );
 
 		//valread = read( sock , buffer, 1024);
 		//printf("received message: %s\n",buffer );
-		memset(buffer,0,strlen(buffer));
-		memset(encoded_msg,0,strlen(encoded_msg));
-		getchar();
-
-
+		memset(buffer,0,1024);
+		memset(encoded_msg,0,1024);
+		//getchar();
+		sleep(20);
 	}
     return 0;
 }
 
 /*
-
- 0xF9 0x81 0x82 0x83 0x84 0x85 0x86 0xA1 0xA2 0xA3 0xF9
-
+ 0xF9, 0x00, 0x81, 0x10, 0x01, 0x70, 0x69, 0x68, 0x65, 0x6c, 0x6c,
+ 0x6f, 0x77, 0x6f, 0x72, 0x6c, 0x64, 0x31, 0x32, 0x33, 0x8A, 0xF9
  */

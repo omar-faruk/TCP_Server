@@ -6,11 +6,25 @@
 #define VTSTESTSERVER_LOOKUP_H
 
 #include <stdint.h>
+#include <stdbool.h>
+
+typedef struct reply{
+    uint8_t *msg;
+    uint8_t cmd_value;
+}Entry;
 
 typedef struct lookup_table{
-    uint8_t **msg;
-    int no_of_entries;
+    Entry *entries;
     int socket_fd;
-}LTable;
+    int total_entries;
+}Ltable;
+
+Ltable *cmd_lookup_table;
+int table_size=0;
+
+
+uint8_t* lookup(int socket_fd, int command_value);
+
+int insert(uint8_t *msg, uint8_t cmd_value, int socket_fd);
 
 #endif //VTSTESTSERVER_LOOKUP_H
