@@ -4,7 +4,7 @@
 
 #include "lookup.h"
 
-uint8_t * lookup(int socket_fd, int command_value){
+uint8_t* lookup(int socket_fd, int command_value){
 
     int i,table_idx=-1;
 
@@ -58,7 +58,6 @@ int insert(uint8_t *msg, uint8_t cmd_value, int socket_fd){
         puts("no entry found, entry to lookup table");
         table_entry_idx = table_size;
         table_size++;
-
     }
 
 
@@ -74,4 +73,27 @@ int insert(uint8_t *msg, uint8_t cmd_value, int socket_fd){
     puts("entry successfull");
 
     return table_entry_idx;
+}
+
+int add_new_device(uint8_t *vts_id)
+{
+    devices[no_of_devices].id = no_of_devices;
+    devices[no_of_devices].vts = vts_id;
+
+    //printf("%s \n",devices[no_of_devices].vts);
+    //printf("new device: %s added to table id: %d\n",devices[no_of_devices].vts,no_of_devices);
+
+    return  no_of_devices++;;
+}
+
+int vts_entry_id(uint8_t *vts_id)
+{
+    int i;
+
+    for(i = 0; i < no_of_devices; i++){
+        if(devices[i].vts==vts_id){
+            return devices[i].id;
+        }
+    }
+    return -1;
 }

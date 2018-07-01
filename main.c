@@ -31,6 +31,8 @@ typedef enum{
     BATTERY
 }ChannelID;
 
+typedef struct _connection Connection;
+
 int msglen(uint8_t *msg)
 {
     int length=1;
@@ -40,9 +42,10 @@ int msglen(uint8_t *msg)
     return length;
 }
 
-void parser(uint8_t *msg, int msg_len,int socket_fd){
+void parser(uint8_t *msg, int msg_len, Connection *conn_ptr){
 
     int i;
+    Connection conn = *((Connection *)(conn_ptr));
 
     if(msg[0]!= 0xF9){
         //actually crc check will be performed here
@@ -54,7 +57,8 @@ void parser(uint8_t *msg, int msg_len,int socket_fd){
         {
             case CONTROL:
                 puts("open controll channel");
-                control(msg,msg_len,socket_fd);
+                control(msg,msg_len,&conn);
+                printf("connected vts id: %s, to socket: %d, lookup table entry id: %d\n",conn.vts_id,conn.socket_fd,conn.vts_entry_id);
                 break;
 
             case GPS:
@@ -108,12 +112,18 @@ void parser(uint8_t *msg, int msg_len,int socket_fd){
     }
 }
 
-void *read_socket(void *sock_ptr) {
+void *read_socket(void *sock_ptr){
     uint8_t buffer[1024];
     uint8_t data[1024];
+
     int i,data_length = 0;
     int socket_fd = *((int *)sock_ptr);
     free(sock_ptr);
+
+    Connection conn;
+    conn.socket_fd = socket_fd;
+    conn.vts_id = (uint8_t *)malloc(15*sizeof(uint8_t));
+    conn.vts_entry_id = -1;
 
     printf("Communication socket: %d\n",socket_fd);
 
@@ -123,10 +133,11 @@ void *read_socket(void *sock_ptr) {
 
         if(strlen(buffer)>0)
         {
-            printf("bytes received: %d\n",msglen(buffer));
-            printData(buffer,msglen(buffer));
+            //printf("bytes received: %d\n",msglen(buffer));
+            //printData(buffer,msglen(buffer));
             decodeData(buffer,data,msglen(buffer),&data_length);
-            parser(data,data_length,socket_fd);
+
+            parser(data,data_length,&conn);
         }
 
         //printf("Input for socket:%d\t:",socket_fd);
@@ -218,10 +229,12 @@ void *listener() {
 int main(int argc, char const *argv[]) {
 
     int status;
+    no_of_devices = 0;
 
     status = pthread_create(&listener_thread, NULL, listener, NULL);
-    cmd_lookup_table = malloc(10*sizeof(Ltable));
 
+    cmd_lookup_table = malloc(20*sizeof(Ltable));
+    devices = malloc(20*sizeof(VTS));
 
     if(status != 0 ){
         puts("cannot start listener thread\n");
