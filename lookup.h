@@ -18,7 +18,7 @@ typedef struct reply{
 
 typedef struct lookup_table{
     Entry *entries;
-    int socket_fd;
+    uint8_t lookup_table_id;
     int total_entries;
 }Ltable;
 
@@ -40,8 +40,8 @@ int no_of_devices;
 int table_size;
 
 
-uint8_t* lookup(int socket_fd, int command_value);
-int insert(uint8_t *msg, uint8_t cmd_value, int socket_fd);
+uint8_t* lookup(uint8_t lookup_table_id, uint8_t command_value);
+int insert(uint8_t *msg, uint8_t cmd_value, uint8_t lookup_table_id);
 int add_new_device(uint8_t *device_id);
 int vts_entry_id(uint8_t *device_id);
 

@@ -31,8 +31,6 @@ void encodeData(uint8_t *msg, uint8_t *enc_data, int raw_data_len, int *enc_len)
     }
     enc_data[j]='\0';
     *enc_len=j;
-
-
 }
 
 void decodeData(uint8_t *encoded_data, uint8_t *decoded_data, int len,int *decoded_data_length){
@@ -61,4 +59,50 @@ void printData(uint8_t *msg, int msg_len){
         printf("%x ",msg[i]);
     }
     puts("");
+}
+
+
+uint8_t ascii_to_hex(char c)
+{
+    if(c>='A' && c<='F'){
+        return c-'A'+10;
+    }
+    else if(c>='a' && c<='f'){
+        return c-'a'+10;
+    }
+    else
+        return c-'0';
+}
+
+uint8_t str_to_uint_8(char *data)
+{
+    int num = 0;
+    num = ascii_to_hex(data[2])*16+ascii_to_hex(data[3]);
+    return (uint8_t)(num);
+
+}
+
+int hex_file_read(char *filename, uint8_t *dest_array, int *len)
+{
+    int retval = 0;
+    uint8_t num;
+    char data[1024];
+
+    freopen(filename,"r",stdin);
+
+    while(scanf("%s",data)!=EOF)
+    {
+        num = str_to_uint_8(data);
+        //printf("%x ",num);
+        dest_array[retval++] = num;
+    }
+    *len = retval;
+    return retval;
+}
+
+int write_to_file(char *filename, char *src, int len)
+{
+    int retval = 0;
+
+    return retval;
 }

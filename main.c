@@ -56,9 +56,9 @@ void parser(uint8_t *msg, int msg_len, Connection *conn_ptr){
         switch (msg[1])
         {
             case CONTROL:
-                puts("open controll channel");
+                //puts("open controll channel");
                 control(msg,msg_len,&conn);
-                printf("connected vts id: %s, to socket: %d, lookup table entry id: %d\n",conn.vts_id,conn.socket_fd,conn.vts_entry_id);
+                //printf("connected vts id: %s, to socket: %d, lookup table entry id: %d\n",conn.vts_id,conn.socket_fd,conn.vts_entry_id);
                 break;
 
             case GPS:
@@ -184,19 +184,19 @@ void *listener() {
             perror("bind failed");
             exit(EXIT_FAILURE);
         }
-        puts("bind successfull");
+        //puts("bind successfull");
         if (listen(server_fd, 3) < 0)
         {
             perror("listen");
             exit(EXIT_FAILURE);
         }
-        puts("listen successfull");
+        //puts("listen successfull");
         if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen))<0)
         {
             perror("accept");
             exit(EXIT_FAILURE);
         }
-        puts("accept successfull");
+        //puts("accept successfull");
         int peer_add_len = sizeof(peer_address);
 
         int ret = getpeername(new_socket, (struct sockaddr *)&peer_address, (socklen_t*)&peer_add_len);
@@ -215,7 +215,7 @@ void *listener() {
             inet_ntop(AF_INET, &s->sin_addr, ipstr, sizeof ipstr);
         }
 
-        printf("Peer IP address: %s\n", ipstr);
+        printf("\nPeer IP address: %s", ipstr);
 
         pthread_t new_socket_reader;
         //continuously read the socket
