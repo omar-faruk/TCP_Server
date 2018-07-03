@@ -9,6 +9,7 @@
 #include <arpa/inet.h>
 #include <pthread.h>
 #include <errno.h>
+#include <sys/socketvar.h>
 #include "channel.h"
 #include "crypto.h"
 
@@ -126,13 +127,24 @@ void *read_socket(void *sock_ptr){
     conn.vts_entry_id = -1;
 
     printf("Communication socket: %d\n",socket_fd);
-
+    int flag =1;
     while(1)
     {
-        read(socket_fd,buffer,1024);
+        int ret = recv(socket_fd,buffer,1024,0);
 
+        if(flag){
+            printf("ret:%d\n",errno);
+            flag =0;
+        }
+        printf("ret:%d\n",ret);
         if(strlen(buffer)>0)
         {
+            //puts(buffer);
+            if(strcmp(buffer,"#####")==0){
+                printf("terminating socket: %d\n",socket_fd);
+                close(socket_fd);
+                break;
+            }
             //printf("bytes received: %d\n",msglen(buffer));
             //printData(buffer,msglen(buffer));
             decodeData(buffer,data,msglen(buffer),&data_length);
@@ -233,8 +245,8 @@ int main(int argc, char const *argv[]) {
 
     status = pthread_create(&listener_thread, NULL, listener, NULL);
 
-    cmd_lookup_table = malloc(20*sizeof(Ltable));
-    devices = malloc(20*sizeof(VTS));
+    cmd_lookup_table = malloc(sizeof(Ltable));
+    devices = malloc(sizeof(VTS));
 
     if(status != 0 ){
         puts("cannot start listener thread\n");
@@ -242,7 +254,7 @@ int main(int argc, char const *argv[]) {
 
     while(1)
     {
-        sleep(1000);
+        sleep(100);
     }
 
 }

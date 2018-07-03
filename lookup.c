@@ -60,13 +60,27 @@ int insert(uint8_t *msg, uint8_t cmd_value, uint8_t lookup_table_id){
     //printf("inserting new reply %s to cmd value: %x for lookup table id %d\n",msg,cmd_value,table_entry_idx);
 
     cmd_lookup_table[table_entry_idx].lookup_table_id = lookup_table_id;
-    cmd_lookup_table[table_entry_idx].entries = (Entry *)(malloc(sizeof(Entry)));
 
-    cmd_lookup_table[table_entry_idx].entries->msg = msg;
-    cmd_lookup_table[table_entry_idx].entries->cmd_value = cmd_value;
+    if(cmd_lookup_table[table_entry_idx].total_entries==0){
+        cmd_lookup_table[table_entry_idx].entries = (Entry*)(malloc(500*sizeof(Entry)));
+    }
+
+
+    i= cmd_lookup_table[table_entry_idx].total_entries;
+    cmd_lookup_table[table_entry_idx].entries[i].msg=(uint8_t *)malloc(strlen(msg));
+    cmd_lookup_table[table_entry_idx].entries[i].msg=msg;
+    cmd_lookup_table[table_entry_idx].entries[i].cmd_value = cmd_value;
     cmd_lookup_table[table_entry_idx].total_entries++;
-    printf("entry successfull %s, cmd value: %x \n",cmd_lookup_table[table_entry_idx].entries->msg,cmd_lookup_table[table_entry_idx].entries->cmd_value);
+    //printf("entry successfull %s, cmd value: %x \n",cmd_lookup_table[table_entry_idx].entries[i].msg,cmd_lookup_table[table_entry_idx].entries[i].cmd_value);
+    //printf("to lookup table:%d\n",cmd_lookup_table[table_entry_idx].lookup_table_id );
 
+    printf("Total Entries: %d\n",cmd_lookup_table[table_entry_idx].total_entries);
+    /*
+    for(i=0;i<cmd_lookup_table[table_entry_idx].total_entries;i++){
+        printf("%s, cmd value: %x \n",cmd_lookup_table[table_entry_idx].entries[i].msg,cmd_lookup_table[table_entry_idx].entries[i].cmd_value);
+    }
+    puts("");
+     */
     return table_entry_idx;
 }
 
@@ -74,10 +88,8 @@ int add_new_device(uint8_t *vts_id)
 {
     devices[no_of_devices].id = no_of_devices;
     devices[no_of_devices].vts = vts_id;
-
     //printf("%s \n",devices[no_of_devices].vts);
     //printf("new device: %s added to table id: %d\n",devices[no_of_devices].vts,no_of_devices);
-
     return  no_of_devices++;;
 }
 

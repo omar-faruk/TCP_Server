@@ -62,6 +62,7 @@ void control(uint8_t *msg, int msg_len, Connection *conn_ptr)
         for(j=6;j<payload_length+6;j++) {
             reply_string[j-6] = msg[j];
         }
+        reply_string[j-6]='\0';
 
         int ret_val = insert(reply_string,command_value,lookup_table_id);
 
