@@ -114,22 +114,25 @@ int main(int argc, char const *argv[])
         printf("\nConnection Failed \n");
         return -1;
     }
+
     while(1){
 
+
 		printData(msg,msglen(msg));
-
 		encodeData(msg,encoded_msg,msglen(msg),&encoded_length);
-
 		printf("encoded_data_length: %d\nencoded data: ",encoded_length);
 		printData(encoded_msg,encoded_length);
-
-
 		//decodeData(encoded_msg,buffer,encoded_length,&j);
-
 		send(sock , encoded_msg , encoded_length , 0 );
 
 		int valread = read( sock , buffer, 1024);
+
 		printf("received message: %s\n",buffer );
+
+		if(strcmp(buffer,"ping")==0){
+			puts("ping from server, sending pong...");
+			send(sock,"pong",4,0);
+		}
 		memset(buffer,0,1024);
 		memset(encoded_msg,0,1024);
 		//getchar();

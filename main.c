@@ -12,6 +12,7 @@
 #include <sys/socketvar.h>
 #include "channel.h"
 #include "crypto.h"
+#include <time.h>
 
 #define PORT 6842
 
@@ -127,19 +128,21 @@ void *read_socket(void *sock_ptr){
     conn.vts_entry_id = -1;
 
     printf("Communication socket: %d\n",socket_fd);
-    int flag =1;
+    int flag;
+    clock_t t1,t2;
+    t1 = clock();
+
     while(1)
     {
         int ret = recv(socket_fd,buffer,1024,0);
 
-        if(flag){
-            printf("ret:%d\n",errno);
-            flag =0;
-        }
-        printf("ret:%d\n",ret);
-        if(strlen(buffer)>0)
+
+        //printf("ret:%d\n",ret);
+
+        if(ret>0)
         {
             //puts(buffer);
+
             if(strcmp(buffer,"#####")==0){
                 printf("terminating socket: %d\n",socket_fd);
                 close(socket_fd);
@@ -150,6 +153,16 @@ void *read_socket(void *sock_ptr){
             decodeData(buffer,data,msglen(buffer),&data_length);
 
             parser(data,data_length,&conn);
+
+            t1=clock();
+        }
+        else{
+            t2 = clock();
+            //printf("elapsed time: %ld\n",(t2-t1)/CLOCKS_PER_SEC);
+            if((t2-t1)/CLOCKS_PER_SEC>=2){
+                puts("client disconnected, terminating connection...");
+                pthread_exit(0);
+            }
         }
 
         //printf("Input for socket:%d\t:",socket_fd);
@@ -159,7 +172,7 @@ void *read_socket(void *sock_ptr){
         memset(buffer,0,1024);
         memset(data,0,1024);
     }
-
+    pthread_exit(0);
 }
 
 void *listener() {
@@ -234,6 +247,7 @@ void *listener() {
         int *socket_arg = malloc(sizeof(*socket_arg));
         *socket_arg = new_socket;
         pthread_create(&new_socket_reader,NULL,read_socket,socket_arg);
+        pthread_detach(new_socket_reader);
         puts("");
     }
 }
