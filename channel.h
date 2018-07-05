@@ -9,6 +9,7 @@
 #include <sys/socket.h>
 #include "crypto.h"
 #include "lookup.h"
+#include "datatypes.h"
 
 void control(uint8_t *msg, int msg_len,Connection *conn_ptr);
 void gps(uint8_t *msg, int msg_len,Connection *conn_ptr);

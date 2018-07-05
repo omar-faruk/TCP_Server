@@ -12,7 +12,8 @@
 #include <sys/socketvar.h>
 #include "channel.h"
 #include "crypto.h"
-#include <time.h>
+#include "datatypes.h"
+
 
 #define PORT 6842
 
@@ -135,7 +136,6 @@ void *read_socket(void *sock_ptr){
     while(1)
     {
         int ret = recv(socket_fd,buffer,1024,0);
-
 
         //printf("ret:%d\n",ret);
 
