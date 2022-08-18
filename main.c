@@ -10,8 +10,7 @@
 #include <pthread.h>
 #include <errno.h>
 #include <sys/socketvar.h>
-#include "channel.h"
-#include "crypto.h"
+#include "lookup.h"
 #include "datatypes.h"
 
 
@@ -255,6 +254,9 @@ void *listener() {
 int main(int argc, char const *argv[]) {
 
     int status;
+    extern int no_of_devices;
+    extern lookup_table cmd_lookup_table;
+
     no_of_devices = 0;
 
     status = pthread_create(&listener_thread, NULL, listener, NULL);

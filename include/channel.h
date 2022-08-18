@@ -2,8 +2,8 @@
 // Created by munna on 6/26/18.
 //
 
-#ifndef VTSTESTSERVER_CHANNEL_H
-#define VTSTESTSERVER_CHANNEL_H
+#ifndef CHANNEL_H
+#define CHANNEL_H
 
 #include <stdint.h>
 #include <sys/socket.h>
@@ -20,4 +20,4 @@ void ac(uint8_t *msg, int msg_len,Connection *conn_ptr);
 void door(uint8_t *msg, int msg_len,Connection *conn_ptr);
 void panic(uint8_t *msg, int msg_len,Connection *conn_ptr);
 
-#endif //VTSTESTSERVER_CHANNEL_H
+#endif //CHANNEL_H

@@ -2,8 +2,8 @@
 // Created by munna on 6/27/18.
 //
 
-#ifndef VTSTESTSERVER_LOOKUP_H
-#define VTSTESTSERVER_LOOKUP_H
+#ifndef LOOKUP_H
+#define LOOKUP_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -25,4 +25,4 @@ int insert(uint8_t *msg, uint8_t cmd_value, uint8_t lookup_table_id);
 int add_new_device(uint8_t *device_id);
 int vts_entry_id(uint8_t *device_id);
 
-#endif //VTSTESTSERVER_LOOKUP_H
+#endif //LOOKUP_H

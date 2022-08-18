@@ -2,8 +2,8 @@
 // Created by munna on 7/5/18.
 //
 
-#ifndef VTSTESTSERVER_DATA_TYPE_H
-#define VTSTESTSERVER_DATA_TYPE_H
+#ifndef DATATYPE_H
+#define DATATYPE_H
 
 typedef struct reply{
     uint8_t *msg;
@@ -27,4 +27,4 @@ typedef struct _connection{
     int vts_entry_id;
 }Connection;
 
-#endif //VTSTESTSERVER_DATA_TYPE_H
+#endif //DATATYPE_H

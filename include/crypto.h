@@ -2,8 +2,8 @@
 // Created by munna on 6/26/18.
 //
 
-#ifndef VTSTESTSERVER_CRYPTO_H
-#define VTSTESTSERVER_CRYPTO_H
+#ifndef CRYPTO_H
+#define CRYPTO_H
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -18,4 +18,4 @@ int hex_file_read(char *filename, uint8_t *dest_array, int *len);
 uint8_t str_to_uint_8(char *data);
 uint8_t ascii_to_hex(char c);
 
-#endif //VTSTESTSERVER_CRYPTO_H
+#endif //CRYPTO_H
